@@ -1,14 +1,18 @@
 import { parseArgs } from "./cli/parseArgs.js";
-import { getWeatherForCities } from "./services/weatherService.js";
+import { formatWeatherReport } from "./format/consoleFormatter.js";
+import { getWeatherReport } from "./storage/reportStorage.js";
 
 try {
-  const { cities, days } = parseArgs(process.argv.slice(2));
+  const { cities, days, noCache } = parseArgs(process.argv.slice(2));
 
-  const results = await getWeatherForCities(cities, days);
+  const reportPromises = cities.map((city) =>
+    getWeatherReport(city, days, noCache),
+  );
+  const results = await Promise.allSettled(reportPromises);
 
   for (const result of results) {
     if (result.status === "fulfilled") {
-      console.dir(result.value, { depth: null });
+      console.log(formatWeatherReport(result.value));
     } else {
       console.error(result.reason.message);
     }
