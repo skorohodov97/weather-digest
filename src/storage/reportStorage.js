@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { getWeatherForCity } from "../services/weatherService.js";
 
-const REPORTS_DIRECTORY = "reports";
+const REPORTS_DIRECTORY = process.env.REPORTS_DIRECTORY ?? "reports";
 
 function getTodayDate() {
   return new Date().toISOString().slice(0, 10);
