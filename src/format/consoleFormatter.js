@@ -22,6 +22,8 @@ function createTable(headers, rows) {
 export function formatWeatherReport(report) {
   const { city, forecast } = report;
   const { daily } = forecast;
+  const temperatureUnit = forecast.temperatureUnit ?? "°C";
+  const precipitationUnit = forecast.precipitationUnit ?? "мм";
   const rows = daily.time.map((date, index) => [
     date,
     daily.temperatureMin[index],
@@ -29,7 +31,12 @@ export function formatWeatherReport(report) {
     daily.precipitationSum[index],
   ]);
   const table = createTable(
-    ["Дата", "Мин., °C", "Макс., °C", "Осадки, мм"],
+    [
+      "Дата",
+      `Мин., ${temperatureUnit}`,
+      `Макс., ${temperatureUnit}`,
+      `Осадки, ${precipitationUnit}`,
+    ],
     rows,
   );
 

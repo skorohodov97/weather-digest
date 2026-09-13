@@ -100,6 +100,8 @@ export async function getWeatherForecast(latitude, longitude, days) {
 
   return {
     timezone: data.timezone,
+    temperatureUnit: data.daily_units?.temperature_2m_max,
+    precipitationUnit: data.daily_units?.precipitation_sum,
     daily: {
       time: daily.time,
       temperatureMax: daily.temperature_2m_max,
