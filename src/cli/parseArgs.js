@@ -1,42 +1,78 @@
 export function parseArgs(args) {
-  const allowedArgs = ["--city", "--days", "--no-cache"];
-  for (const arg of args) {
-    if (arg.startsWith("--") && !allowedArgs.includes(arg)) {
-      throw new Error(`Invalid argument: ${arg}`);
-    }
-  }
-  const cityIndex = args.indexOf("--city");
-  const daysIndex = args.indexOf("--days");
-
-  if (cityIndex == -1 || args[cityIndex + 1] === undefined) {
-    throw new Error("Invalid argument. Please use --city <city_name>");
-  }
-
-  const cities = args[cityIndex + 1]
-    .split(",")
-    .map((city) => city.trim())
-    .filter((city) => city.length > 0);
-
-  if (cities.length === 0) {
-    throw new Error("Invalid argument: city name cannot be empty");
-  }
   const result = {
-    cities,
+    cities: [],
     days: 3,
-    noCache: args.includes("--no-cache"),
+    noCache: false,
   };
+  let hasCity = false;
+  let hasDays = false;
 
-  if (daysIndex !== -1) {
-    if (args[daysIndex + 1] === undefined) {
-      throw new Error("Invalid argument: --days requires a value");
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+
+    if (arg === "--city") {
+      if (hasCity) {
+        throw new Error("Invalid argument: --city can be used only once");
+      }
+
+      const cityNames = args[index + 1];
+      if (cityNames === undefined || cityNames.startsWith("--")) {
+        throw new Error("Invalid argument. Please use --city <city_name>");
+      }
+
+      result.cities = cityNames
+        .split(",")
+        .map((city) => city.trim())
+        .filter((city) => city.length > 0);
+
+      if (result.cities.length === 0) {
+        throw new Error("Invalid argument: city name cannot be empty");
+      }
+
+      hasCity = true;
+      index += 1;
+      continue;
     }
-    const days = Number(args[daysIndex + 1]);
-    if (!Number.isInteger(days) || days < 1 || days > 7) {
-      throw new Error(
-        "Invalid argument: --days must be an integer from 1 to 7",
-      );
+
+    if (arg === "--days") {
+      if (hasDays) {
+        throw new Error("Invalid argument: --days can be used only once");
+      }
+
+      const daysValue = args[index + 1];
+      const days = Number(daysValue);
+      if (
+        daysValue === undefined ||
+        daysValue.startsWith("--") ||
+        !Number.isInteger(days) ||
+        days < 1 ||
+        days > 7
+      ) {
+        throw new Error(
+          "Invalid argument: --days must be an integer from 1 to 7",
+        );
+      }
+
+      result.days = days;
+      hasDays = true;
+      index += 1;
+      continue;
     }
-    result.days = days;
+
+    if (arg === "--no-cache") {
+      if (result.noCache) {
+        throw new Error("Invalid argument: --no-cache can be used only once");
+      }
+
+      result.noCache = true;
+      continue;
+    }
+
+    throw new Error(`Invalid argument: ${arg}`);
+  }
+
+  if (!hasCity) {
+    throw new Error("Invalid argument. Please use --city <city_name>");
   }
 
   return result;
