@@ -6,8 +6,18 @@ try {
 
   const results = await getWeatherForCities(cities, days);
 
-  console.dir(results, { depth: null });
+  for (const result of results) {
+    if (result.status === "fulfilled") {
+      console.dir(result.value, { depth: null });
+    } else {
+      console.error(result.reason.message);
+    }
+  }
+
+  if (results.some((result) => result.status === "rejected")) {
+    process.exitCode = 1;
+  }
 } catch (error) {
   console.error(error.message);
-  process.exit(1);
+  process.exitCode = 1;
 }
