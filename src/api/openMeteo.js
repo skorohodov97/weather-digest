@@ -1,6 +1,11 @@
-const GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search";
-const FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
+const GEOCODING_URL =
+  process.env.GEOCODING_API_URL ??
+  "https://geocoding-api.open-meteo.com/v1/search";
+const FORECAST_URL =
+  process.env.FORECAST_API_URL ?? "https://api.open-meteo.com/v1/forecast";
 const DEFAULT_TIMEOUT_MS = 5000;
+const TEMPERATURE_UNIT = process.env.TEMPERATURE_UNIT ?? "celsius";
+const PRECIPITATION_UNIT = process.env.PRECIPITATION_UNIT ?? "mm";
 
 function getTimeoutMs() {
   const timeoutMs = Number(process.env.REQUEST_TIMEOUT_MS);
@@ -86,6 +91,8 @@ export async function getWeatherForecast(latitude, longitude, days) {
     daily: "temperature_2m_max,temperature_2m_min,precipitation_sum",
     forecast_days: String(days),
     timezone: "auto",
+    temperature_unit: TEMPERATURE_UNIT,
+    precipitation_unit: PRECIPITATION_UNIT,
   }).toString();
 
   const data = await fetchJson(url);
@@ -93,6 +100,8 @@ export async function getWeatherForecast(latitude, longitude, days) {
 
   return {
     timezone: data.timezone,
+    temperatureUnit: data.daily_units?.temperature_2m_max,
+    precipitationUnit: data.daily_units?.precipitation_sum,
     daily: {
       time: daily.time,
       temperatureMax: daily.temperature_2m_max,

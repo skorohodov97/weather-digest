@@ -1,0 +1,147 @@
+{
+  "info": {
+    "_postman_id": "ebbd1a6e-5a90-4967-a2f4-4d0abf2c0001",
+    "name": "Weather Digest — Open-Meteo",
+    "description": "Запросы Open-Meteo для проекта Weather Digest.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "geocodingBaseUrl",
+      "value": "https://geocoding-api.open-meteo.com/v1",
+      "type": "string"
+    },
+    {
+      "key": "forecastBaseUrl",
+      "value": "https://api.open-meteo.com/v1",
+      "type": "string"
+    },
+    {
+      "key": "city",
+      "value": "Москва",
+      "type": "string"
+    },
+    {
+      "key": "lat",
+      "value": "55.75204",
+      "type": "string"
+    },
+    {
+      "key": "lon",
+      "value": "37.61781",
+      "type": "string"
+    },
+    {
+      "key": "days",
+      "value": "3",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Геокодинг города",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{geocodingBaseUrl}}/search?name={{city}}&count=1&language=ru&format=json",
+          "host": ["{{geocodingBaseUrl}}"],
+          "path": ["search"],
+          "query": [
+            { "key": "name", "value": "{{city}}" },
+            { "key": "count", "value": "1" },
+            { "key": "language", "value": "ru" },
+            { "key": "format", "value": "json" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Успех — Москва (200)",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{geocodingBaseUrl}}/search?name=Москва&count=1&language=ru&format=json"
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "cookie": [],
+          "body": "{\n  \"results\": [\n    {\n      \"id\": 524901,\n      \"name\": \"Москва\",\n      \"latitude\": 55.75204,\n      \"longitude\": 37.61781,\n      \"country\": \"Россия\"\n    }\n  ]\n}"
+        },
+        {
+          "name": "Город не найден (200)",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{geocodingBaseUrl}}/search?name=not-a-real-city&count=1&language=ru&format=json"
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "cookie": [],
+          "body": "{\n  \"generationtime_ms\": 0.1\n}"
+        },
+        {
+          "name": "Некорректный параметр count (400)",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{geocodingBaseUrl}}/search?name=Москва&count=0&language=ru&format=json"
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "cookie": [],
+          "body": "{\n  \"error\": true,\n  \"reason\": \"Parameter count must be between 1 and 100\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Прогноз погоды",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{forecastBaseUrl}}/forecast?latitude={{lat}}&longitude={{lon}}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&forecast_days={{days}}&timezone=auto",
+          "host": ["{{forecastBaseUrl}}"],
+          "path": ["forecast"],
+          "query": [
+            { "key": "latitude", "value": "{{lat}}" },
+            { "key": "longitude", "value": "{{lon}}" },
+            { "key": "daily", "value": "temperature_2m_max,temperature_2m_min,precipitation_sum" },
+            { "key": "forecast_days", "value": "{{days}}" },
+            { "key": "timezone", "value": "auto" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Успех — прогноз Москвы (200)",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{forecastBaseUrl}}/forecast?latitude=55.75204&longitude=37.61781&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&forecast_days=3&timezone=auto"
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "cookie": [],
+          "body": "{\n  \"timezone\": \"Europe/Moscow\",\n  \"daily\": {\n    \"time\": [\"2026-09-13\", \"2026-09-14\", \"2026-09-15\"],\n    \"temperature_2m_max\": [16.2, 19.1, 18.4],\n    \"temperature_2m_min\": [7.7, 8.9, 9.4],\n    \"precipitation_sum\": [0, 0, 1.2]\n  }\n}"
+        }
+      ]
+    }
+  ]
+}
